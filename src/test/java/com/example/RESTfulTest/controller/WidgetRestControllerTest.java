@@ -106,6 +106,21 @@ class WidgetRestControllerTest {
                 .andExpect(jsonPath("$.version", is(1)));
     }
 
+    @Test
+    @DisplayName("PUT /rest/widget/{id}")
+    void testUpdateWidgetByIdNotFound() throws Exception{
+        Widget widgetToUpdate = new Widget(1l,"Widget Name 2", "Description 2", 1);
+
+        doReturn(Optional.empty()).when(service).findById(1l);
+
+        doReturn(widgetToUpdate).when(service).save(any());
+
+        mockMvc.perform(put("/rest/widget/{id}",1l)
+                .content(asJsonString(widgetToUpdate))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.IF_MATCH,"1"))
+                .andExpect(status().isNotFound());
+    }
 
     static String asJsonString(final Object obj) {
         try {
